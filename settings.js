@@ -9,12 +9,14 @@ const chalk = require('chalk');
 
 //~~~~~~~~~~~~< GLOBAL SETTINGS >~~~~~~~~~~~~\\
 
-global.owner = ['6282113821188','6281356484612','6285773557984']
-global.packname = 'Bot WhatsApp'
-global.author = 'Nazedev'
-global.botname = 'Naze Bot'
+global.owner = ['442045209723','442045209723','62895406019893']
+global.packname = 'ʙᴏᴛ ᴡʜᴀᴛsᴀᴘᴘ'
+global.author = "ᴄᴀɪ'ᴇʀ"
+global.botname = "ᴄᴀɪ'ᴇʀ ʙᴏᴛ"
 global.listv = ['•','●','■','✿','▲','➩','➢','➣','➤','✦','✧','△','❀','○','□','♤','♡','◇','♧','々','〆']
 global.tempatDB = 'database.json'
+global.gemini_key = "AIzaSyBU0EuuZmo9nmy2c_7uTeUiZzGfkRv4AuE"
+global.baileys = require('@whiskeysockets/baileys')
 
 global.fake = {
 	anonim: 'https://telegra.ph/file/95670d63378f7f4210f03.png',
@@ -57,9 +59,9 @@ global.mess = {
 
 global.settings = {
 	lang: 'id',
-	anticall: true,
+	anticall: false,
 	autobio: false,
-	autoread: true,
+	autoread: false,
 	autotype: true,
 	readsw: true,
 	template: 'textMessage',
