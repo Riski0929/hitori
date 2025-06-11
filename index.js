@@ -46,6 +46,31 @@ const { isUrl, generateMessageTag, getBuffer, getSizeMedia, fetchJson, sleep } =
 	* Whatsapp : https://whatsapp.com/channel/0029VaWOkNm7DAWtkvkJBK43
 */
 
+				// --- Plugin Loader ---
+
+const pluginsLoader = async (directory) => {
+    let plugins = [];
+    const folders = fs.readdirSync(directory);
+    folders.forEach(file => {
+        const filePath = path.join(directory, file);
+        if (filePath.endsWith(".js")) {
+            try {
+                const resolvedPath = require.resolve(filePath);
+                if (require.cache[resolvedPath]) {
+                    delete require.cache[resolvedPath];
+                }
+                const plugin = require(filePath);
+                plugin.__filename = filePath;
+                plugins.push(plugin); 
+                console.log(chalk.green(`${file}`)); // Gunakan chalk untuk warna hijau
+            } catch (error) {
+                console.log(chalk.red(`${filePath}:`), error); // Gunakan warna merah untuk error
+            }
+        }
+    });
+    return plugins;
+};
+
 async function startNazeBot() {
 	const { state, saveCreds } = await useMultiFileAuthState('nazedev');
 	const { version, isLatest } = await fetchLatestBaileysVersion();
@@ -209,6 +234,10 @@ async function startNazeBot() {
 			}
 		}
 		if (connection == 'open') {
+		if (!global.plugins) {
+    console.log(chalk.cyan.bold('Plugin Load')); // Warna kuning dan bold untuk kesan dramatis
+    global.plugins = await pluginsLoader(path.resolve(__dirname, './plugins'));
+}
 			console.log('Connected to : ' + JSON.stringify(naze.user, null, 2));
 			let botNumber = await naze.decodeJid(naze.user.id);
 			if (global.db?.set[botNumber] && !global.db?.set[botNumber]?.join) {

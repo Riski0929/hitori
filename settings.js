@@ -15,7 +15,7 @@ global.author = 'Zynn'
 global.botname = 'Lynn Bot'
 global.listprefix = ['+','!','.']
 global.listv = ['•','●','■','✿','▲','➩','➢','➣','➤','✦','✧','△','❀','○','□','♤','♡','◇','♧','々','〆']
-global.tempatDB = 'mongodb+srv://ikyx867:5Gsv9VanCuDT2JgE@cluster0.1q2b8ik.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0' // Taruh url mongodb di sini jika menggunakan mongodb. Format : 'mongodb+srv://...'
+global.tempatDB = 'mongodb+srv://Rizky76:Enzy12345Cantik@cluster0.8e66aa7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0' // Taruh url mongodb di sini jika menggunakan mongodb. Format : 'mongodb+srv://...'
 global.tempatStore = 'baileys_store.json' // Taruh url mongodb di sini jika menggunakan mongodb. Format : 'mongodb+srv://...'
 global.pairing_code = true
 global.number_bot = '62895375577040' // Kalo pake panel bisa masukin nomer di sini, jika belum ambil session. Format : '628xx'
@@ -36,7 +36,7 @@ global.my = {
 }
 
 global.limit = {
-	free: 20,
+	free: 30,
 	premium: 999,
 	vip: 9999
 }

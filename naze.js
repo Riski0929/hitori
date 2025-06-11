@@ -128,7 +128,62 @@ module.exports = naze = async (naze, m, msg, store, groupCache) => {
 		const isLimit = db.users[m.sender] ? (db.users[m.sender].limit > 0) : false
 		const isPremium = isCreator || checkStatus(m.sender, premium) || false
 		const isNsfw = m.isGroup ? db.groups[m.chat].nsfw : false
+	
 		
+		const plug = {
+    naze,
+    conn: naze,
+    usedPrefix: prefix,
+    isCreator,
+    command,
+    isCmd,
+    m,
+    text,
+    sleep,
+    setLimit,
+    isLimit,
+    prefix,
+    args,
+    botNumber,
+    isPremium,
+    isGroup: m.isGroup,
+    isPrivate: !m.isGroup,
+    reply: m.reply.bind(m),
+};
+
+for (let plugin of global.plugins) {
+    try {
+        // Cek mute
+        if (m.isGroup && db.groups[m.chat]?.mute && !isCreator) continue;
+        if (isBotUtama) continue;
+
+        // Jalankan plugin.before kalau ada
+        if (typeof plugin.before === 'function') {
+            await plugin.before(m, plug);
+        }
+
+        // Jalankan command kalau cocok
+        if (
+            Array.isArray(plugin.command) &&
+            plugin.command.includes(command.toLowerCase())
+        ) {
+           cmdAdd(db.hit);
+		   cmdAddHit(db.hit, command);
+            if (plugin.owner && !isCreator) return m.reply(mess.owner);
+            if (plugin.botutama && botNumber !== global.number_bot + '@s.whatsapp.net') return m.reply(`Fitur ini hanya bisa dijalankan oleh *Bot Utama*\n@${global.number_bot}`)
+            if (plugin.premium && !isPremium) return m.reply(mess.prem);
+            if (plugin.group && !plug.isGroup) return m.reply(mess.group);
+            if (plugin.admin && !m.isAdmin) return m.reply(mess.admin);
+            if (plugin.private && !plug.isPrivate) return m.reply(mess.private);
+            if (typeof plugin !== "function") return;
+            await plugin(m, plug);
+        }
+
+    } catch (err) {
+        console.error(err);
+    }
+}
+				
 		// Fake
 		const fkontak = {
 			key: {
@@ -2210,117 +2265,89 @@ module.exports = naze = async (naze, m, msg, store, groupCache) => {
 			}
 			break
 			case 'nuliskiri': {
-				if (!isLimit) return m.reply(mess.limit)
-				if (!text) return m.reply(`Kirim perintah *${prefix + command}* Teksnya`)
-				m.reply(mess.wait)
-				const splitText = text.replace(/(\S+\s*){1,9}/g, '$&\n')
-				const fixHeight = splitText.split('\n').slice(0, 31).join('\n')
-				spawn('convert', [
-					'./src/nulis/images/buku/sebelumkiri.jpg',
-					'-font',
-					'./src/nulis/font/Indie-Flower.ttf',
-					'-size',
-					'960x1280',
-					'-pointsize',
-					'23',
-					'-interline-spacing',
-					'2',
-					'-annotate',
-					'+140+153',
-					fixHeight,
-					'./src/nulis/images/buku/setelahkiri.jpg'
-				])
-				.on('error', () => m.reply(mess.error))
-				.on('exit', () => {
-					m.reply({ image: fs.readFileSync('./src/nulis/images/buku/setelahkiri.jpg'), caption: 'Jangan Malas Lord. Jadilah siswa yang rajin ರ_ರ' })
-					setLimit(m, db)
-				})
-			}
-			break
+	if (!isLimit) return m.reply(mess.limit)
+	if (!text && (!m.quoted || !m.quoted.text)) return m.reply(`Kirim/reply pesan *${prefix + command}* Teksnya`)
+	m.reply(mess.wait)
+
+	const axios = require('axios');
+
+	try {
+		let response = await axios.get(`https://zynnaa-api.hf.space/api/v1/nuliskiri?text=${encodeURIComponent(text || m.quoted.text)}`, {
+        responseType: 'arraybuffer'
+      })
+
+      await m.reply({ image: Buffer.from(response.data), caption: 'Jangan Malas Lord. Jadilah siswa yang rajin ರ_ರ' })
+
+		setLimit(m, db);
+	} catch (err) {
+		console.error(err);
+		m.reply('Gagal membuat gambar tulisan.');
+	}
+}
+break;
 			case 'nuliskanan': {
-				if (!isLimit) return m.reply(mess.limit)
-				if (!text) return m.reply(`Kirim perintah *${prefix + command}* Teksnya`)
-				m.reply(mess.wait)
-				const splitText = text.replace(/(\S+\s*){1,9}/g, '$&\n')
-				const fixHeight = splitText.split('\n').slice(0, 31).join('\n')
-				spawn('convert', [
-					'./src/nulis/images/buku/sebelumkanan.jpg',
-					'-font',
-					'./src/nulis/font/Indie-Flower.ttf',
-					'-size',
-					'960x1280',
-					'-pointsize',
-					'23',
-					'-interline-spacing',
-					'2',
-					'-annotate',
-					'+128+129',
-					fixHeight,
-					'./src/nulis/images/buku/setelahkanan.jpg'
-				])
-				.on('error', () => m.reply(mess.error))
-				.on('exit', () => {
-					m.reply({ image: fs.readFileSync('./src/nulis/images/buku/setelahkanan.jpg'), caption: 'Jangan Malas Lord. Jadilah siswa yang rajin ರ_ರ' })
-					setLimit(m, db)
-				})
-			}
-			break
+	if (!isLimit) return m.reply(mess.limit)
+	if (!text && (!m.quoted || !m.quoted.text)) return m.reply(`Kirim/reply pesan *${prefix + command}* Teksnya`)
+	m.reply(mess.wait)
+
+	const axios = require('axios');
+
+	try {
+		let response = await axios.get(`https://zynnaa-api.hf.space/api/v1/nuliskanan?text=${encodeURIComponent(text || m.quoted.text)}`, {
+        responseType: 'arraybuffer'
+      })
+
+      await m.reply({ image: Buffer.from(response.data), caption: 'Jangan Malas Lord. Jadilah siswa yang rajin ರ_ರ' })
+
+		setLimit(m, db);
+	} catch (err) {
+		console.error(err);
+		m.reply('Gagal membuat gambar tulisan.');
+	}
+}
+break;
 			case 'foliokiri': {
-				if (!isLimit) return m.reply(mess.limit)
-				if (!text) return m.reply(`Kirim perintah *${prefix + command}* Teksnya`)
-				m.reply(mess.wait)
-				const splitText = text.replace(/(\S+\s*){1,9}/g, '$&\n')
-				const fixHeight = splitText.split('\n').slice(0, 38).join('\n')
-				spawn('convert', [
-					'./src/nulis/images/folio/sebelumkiri.jpg',
-					'-font',
-					'./src/nulis/font/Indie-Flower.ttf',
-					'-size',
-					'1720x1280',
-					'-pointsize',
-					'23',
-					'-interline-spacing',
-					'4',
-					'-annotate',
-					'+48+185',
-					fixHeight,
-					'./src/nulis/images/folio/setelahkiri.jpg'
-				])
-				.on('error', () => m.reply(mess.error))
-				.on('exit', () => {
-					m.reply({ image: fs.readFileSync('./src/nulis/images/folio/setelahkiri.jpg'), caption: 'Jangan Malas Lord. Jadilah siswa yang rajin ರ_ರ' })
-					setLimit(m, db)
-				})
-			}
-			break
+	if (!isLimit) return m.reply(mess.limit)
+	if (!text && (!m.quoted || !m.quoted.text)) return m.reply(`Kirim/reply pesan *${prefix + command}* Teksnya`)
+	m.reply(mess.wait)
+
+	const axios = require('axios');
+
+	try {
+		let response = await axios.get(`https://zynnaa-api.hf.space/api/v1/foliokiri?text=${encodeURIComponent(text || m.quoted.text)}`, {
+        responseType: 'arraybuffer'
+      })
+
+      await m.reply({ image: Buffer.from(response.data), caption: 'Jangan Malas Lord. Jadilah siswa yang rajin ರ_ರ' })
+
+		setLimit(m, db);
+	} catch (err) {
+		console.error(err);
+		m.reply('Gagal membuat gambar tulisan.');
+	}
+}
+break;
 			case 'foliokanan': {
-				if (!isLimit) return m.reply(mess.limit)
-				if (!text) return m.reply(`Kirim perintah *${prefix + command}* Teksnya`)
-				m.reply(mess.wait)
-				const splitText = text.replace(/(\S+\s*){1,9}/g, '$&\n')
-				const fixHeight = splitText.split('\n').slice(0, 38).join('\n')
-				spawn('convert', [
-					'./src/nulis/images/folio/sebelumkanan.jpg',
-					'-font',
-					'./src/nulis/font/Indie-Flower.ttf',
-					'-size',
-					'1720x1280',
-					'-pointsize',
-					'23',
-					'-interline-spacing',
-					'4',
-					'-annotate',
-					'+89+190',
-					fixHeight,
-					'./src/nulis/images/folio/setelahkanan.jpg'
-				])
-				.on('error', () => m.reply(mess.error))
-				.on('exit', () => {
-					m.reply({ image: fs.readFileSync('./src/nulis/images/folio/setelahkanan.jpg'), caption: 'Jangan Malas Lord. Jadilah siswa yang rajin ರ_ರ' })
-					setLimit(m, db)
-				})
-			}
-			break
+	if (!isLimit) return m.reply(mess.limit)
+	if (!text && (!m.quoted || !m.quoted.text)) return m.reply(`Kirim/reply pesan *${prefix + command}* Teksnya`)
+	m.reply(mess.wait)
+
+	const axios = require('axios');
+
+	try {
+		let response = await axios.get(`https://zynnaa-api.hf.space/api/v1/foliokanan?text=${encodeURIComponent(text || m.quoted.text)}`, {
+        responseType: 'arraybuffer'
+      })
+
+      await m.reply({ image: Buffer.from(response.data), caption: 'Jangan Malas Lord. Jadilah siswa yang rajin ರ_ರ' })
+
+		setLimit(m, db);
+	} catch (err) {
+		console.error(err);
+		m.reply('Gagal membuat gambar tulisan.');
+	}
+}
+break;
 			case 'bass': case 'blown': case 'deep': case 'earrape': case 'fast': case 'fat': case 'nightcore': case 'reverse': case 'robot': case 'slow': case 'smooth': case 'tupai': {
 				try {
 					let set;
